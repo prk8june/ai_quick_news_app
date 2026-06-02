@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFeed — Premium RSS News Dashboard</title>
+  <!-- SEO Tags -->
+  <meta name="description" content="Stay updated with PulseFeed, a beautiful, real-time RSS news dashboard with customizable categories, trending news analytics, and dark mode.">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo" id="logo-refresh">
+        <i data-lucide="sparkles" class="logo-icon"></i>
+        <h1 class="logo-text">Pulse<span>Feed</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="refresh-btn" class="icon-btn" aria-label="Refresh Feeds">
+          <i data-lucide="refresh-cw" class="refresh-icon"></i>
+        </button>
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+        <button id="settings-toggle" class="settings-btn">
+          <i data-lucide="sliders-horizontal"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="app-main">
+    
+    <!-- Category Tabs Navigation -->
+    <nav class="tabs-nav-container">
+      <div class="tabs-scroll-wrapper" id="category-tabs">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </nav>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-view" class="view-section active">
+      
+      <!-- Top News Trending Carousel -->
+      <section class="carousel-section" id="carousel-section">
+        <div class="section-title-container">
+          <div class="trending-badge">
+            <i data-lucide="flame" class="flame-icon"></i>
+            <span>Trending Now</span>
+          </div>
+        </div>
+        <div class="carousel-container" id="carousel-container">
+          <!-- Rendered dynamically via JS -->
+          <div class="carousel-loader">
+            <div class="spinner"></div>
+            <span>Analyzing news trends...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Articles Feed Grid -->
+      <section class="feed-section">
+        <div class="feed-header">
+          <h2 class="feed-title" id="feed-title-display">Latest Feed</h2>
+          <div class="feed-meta" id="feed-meta-display">Showing top articles</div>
+        </div>
+        
+        <!-- Articles Grid -->
+        <div class="articles-grid" id="articles-grid">
+          <!-- Cards rendered dynamically via JS -->
+          <div class="feed-loader">
+            <div class="spinner"></div>
+            <span>Syncing RSS feeds...</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Settings Slide-out Drawer Panel -->
+  <div id="settings-drawer" class="settings-drawer">
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <div class="drawer-title-wrapper">
+          <i data-lucide="settings" class="drawer-icon"></i>
+          <h2>Subscription Settings</h2>
+        </div>
+        <button id="settings-close" class="close-btn" aria-label="Close Settings">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        
+        <!-- Category Manager Tag Input -->
+        <section class="settings-section">
+          <h3>My News Categories</h3>
+          <p class="section-desc">Add or remove categories. Type a name and press Enter to subscribe to a new category.</p>
+          
+          <div class="tag-input-wrapper">
+            <div class="tag-input-container" id="tag-input-container">
+              <!-- Category Chips will be injected here -->
+              <input type="text" id="category-input" class="category-input" placeholder="Add custom category..." aria-label="Add category input">
+            </div>
+          </div>
+        </section>
+
+        <!-- Feed URL Manager Section -->
+        <section class="settings-section">
+          <h3>Feed Source Manager</h3>
+          <p class="section-desc">Manage specific RSS/Atom feed links for your categories. Custom categories use Google News RSS feeds by default, but can be updated below.</p>
+          
+          <div class="feeds-manager" id="feeds-manager">
+            <!-- Dynamically populated per category -->
+          </div>
+        </section>
+
+        <!-- Reset Button -->
+        <section class="settings-section reset-section">
+          <button id="reset-defaults-btn" class="reset-btn">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Restore Factory Feeds</span>
+          </button>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript file -->
+  <script src="app.js" defer></script>
+</body>
+</html>

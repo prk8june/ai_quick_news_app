@@ -21,14 +21,6 @@ const DEFAULT_CATEGORIES = [
     ]
   },
   {
-    id: 'us',
-    name: 'US-related news',
-    feeds: [
-      'https://rss.nytimes.com/services/xml/rss/nyt/US.xml',
-      'https://feeds.npr.org/1003/rss.xml'
-    ]
-  },
-  {
     id: 'apple',
     name: 'Apple-related news',
     feeds: [
@@ -72,11 +64,11 @@ const CORS_PROXY = window.location.protocol === 'file:' ? 'https://corsproxy.io/
 
 // Stop words list for trending news analysis
 const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'and', 'but', 'or', 'for', 'with', 'on', 'in', 'at', 'to', 'by', 'of', 'is', 'are', 'was', 'were', 
-  'has', 'have', 'had', 'it', 'its', 'they', 'them', 'this', 'that', 'these', 'those', 'from', 'as', 'be', 'will', 
-  'with', 'about', 'how', 'what', 'why', 'who', 'where', 'when', 'more', 'new', 'top', 'latest', 'up', 'down', 'out', 
+  'the', 'a', 'an', 'and', 'but', 'or', 'for', 'with', 'on', 'in', 'at', 'to', 'by', 'of', 'is', 'are', 'was', 'were',
+  'has', 'have', 'had', 'it', 'its', 'they', 'them', 'this', 'that', 'these', 'those', 'from', 'as', 'be', 'will',
+  'with', 'about', 'how', 'what', 'why', 'who', 'where', 'when', 'more', 'new', 'top', 'latest', 'up', 'down', 'out',
   'over', 'under', 'into', 'some', 'any', 'each', 'all', 'every', 'both', 'their', 'our', 'your', 'his', 'her', 'itself',
-  'can', 'could', 'should', 'would', 'may', 'might', 'must', 'just', 'only', 'than', 'then', 'also', 'even', 'after', 
+  'can', 'could', 'should', 'would', 'may', 'might', 'must', 'just', 'only', 'than', 'then', 'also', 'even', 'after',
   'before', 'first', 'second', 'years', 'day', 'week', 'month', 'news', 'update', 'feed'
 ]);
 
@@ -151,7 +143,7 @@ function renderCategoryTabs() {
   if (!container) return;
 
   let html = `<button class="tab-btn ${state.activeCategory === 'all' ? 'active' : ''}" data-category="all">All</button>`;
-  
+
   state.categories.forEach(cat => {
     // Check if category has any articles loaded to show clean feedback
     const activeClass = state.activeCategory === cat.id ? 'active' : '';
@@ -186,7 +178,7 @@ function renderSettingsChips() {
       <span>${cat.name}</span>
       <button class="tag-chip-close" data-id="${cat.id}" aria-label="Remove category">&times;</button>
     `;
-    
+
     chip.querySelector('.tag-chip-close').addEventListener('click', (e) => {
       e.stopPropagation();
       const id = e.currentTarget.getAttribute('data-id');
@@ -289,21 +281,21 @@ function renderFeedsManager() {
 // Fetches articles for a single feed URL, parses and returns normalized array
 async function fetchAndParseFeed(feedUrl, categoryId) {
   const proxyUrl = `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
-  
+
   try {
     const response = await fetch(proxyUrl);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
+
     const xmlText = await response.text();
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-    
+
     // Check parser errors
     const parserError = xmlDoc.querySelector('parsererror');
     if (parserError) throw new Error('XML parsing failed.');
 
     const articles = [];
-    
+
     // Check if RSS 2.0 (item) or Atom (entry)
     const items = xmlDoc.querySelectorAll('item');
     if (items.length > 0) {
@@ -312,11 +304,11 @@ async function fetchAndParseFeed(feedUrl, categoryId) {
         try {
           const title = item.querySelector('title')?.textContent?.trim() || 'Untitled Article';
           const link = item.querySelector('link')?.textContent?.trim() || '';
-          
+
           // Description cleanup
           let description = item.querySelector('description')?.textContent?.trim() || '';
           description = stripHtml(description);
-          
+
           // Date parsing
           const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
           const date = parseDate(pubDate);
@@ -353,19 +345,19 @@ async function fetchAndParseFeed(feedUrl, categoryId) {
       entries.forEach(entry => {
         try {
           const title = entry.querySelector('title')?.textContent?.trim() || 'Untitled Article';
-          
+
           let link = '';
           const linkEl = entry.querySelector('link[rel="alternate"]') || entry.querySelector('link');
           if (linkEl) {
             link = linkEl.getAttribute('href')?.trim() || linkEl.textContent?.trim() || '';
           }
 
-          let description = entry.querySelector('summary')?.textContent?.trim() || 
-                              entry.querySelector('content')?.textContent?.trim() || '';
+          let description = entry.querySelector('summary')?.textContent?.trim() ||
+            entry.querySelector('content')?.textContent?.trim() || '';
           description = stripHtml(description);
 
-          const updatedDate = entry.querySelector('updated')?.textContent?.trim() || 
-                              entry.querySelector('published')?.textContent?.trim() || '';
+          const updatedDate = entry.querySelector('updated')?.textContent?.trim() ||
+            entry.querySelector('published')?.textContent?.trim() || '';
           const date = parseDate(updatedDate);
 
           const creator = entry.querySelector('author name')?.textContent?.trim() || '';
@@ -442,7 +434,7 @@ function extractImageUrl(node) {
 
   // 2. Try namespace local names for media:content and media:thumbnail
   const allChildren = Array.from(node.querySelectorAll('*'));
-  
+
   const mediaContent = allChildren.find(el => el.localName === 'content');
   if (mediaContent && mediaContent.getAttribute('url') && mediaContent.getAttribute('medium') !== 'video') {
     return mediaContent.getAttribute('url');
@@ -464,11 +456,11 @@ function extractImageUrl(node) {
     if (match && match[1]) {
       const src = match[1];
       // Skip tiny trackers or loading gifs
-      if (!src.includes('feeds.feedburner.com') && 
-          !src.includes('doubleclick') && 
-          !src.includes('feedpress') && 
-          !src.endsWith('.gif') &&
-          src.startsWith('http')) {
+      if (!src.includes('feeds.feedburner.com') &&
+        !src.includes('doubleclick') &&
+        !src.includes('feedpress') &&
+        !src.endsWith('.gif') &&
+        src.startsWith('http')) {
         return src;
       }
     }
@@ -500,7 +492,7 @@ async function refreshAllFeeds() {
 
     const feedPromises = cat.feeds.map(url => fetchAndParseFeed(url, cat.id));
     const results = await Promise.allSettled(feedPromises);
-    
+
     // Combine fetched articles
     let combinedArticles = [];
     results.forEach(res => {
@@ -519,13 +511,13 @@ async function refreshAllFeeds() {
 
     // Sort by latest publish date
     uniqueArticles.sort((a, b) => b.date - a.date);
-    
+
     // Store in cache
     state.articlesCache[cat.id] = uniqueArticles;
   });
 
   await Promise.allSettled(fetchPromises);
-  
+
   state.isFetching = false;
   showLoadingStates(false);
   if (refreshBtn) refreshBtn.classList.remove('spinning');
@@ -549,7 +541,7 @@ async function refreshCategoryFeed(categoryId) {
 
   const feedPromises = cat.feeds.map(url => fetchAndParseFeed(url, cat.id));
   const results = await Promise.allSettled(feedPromises);
-  
+
   let combinedArticles = [];
   results.forEach(res => {
     if (res.status === 'fulfilled') {
@@ -595,7 +587,7 @@ function calculateTrendingArticles(articles) {
       .replace(/[^\w\s-]/g, '')
       .split(/\s+/)
       .filter(w => w.length > 2 && !STOP_WORDS.has(w));
-    
+
     // Count frequency
     words.forEach(w => {
       tokenFreq[w] = (tokenFreq[w] || 0) + 1;
@@ -649,13 +641,13 @@ function calculateTrendingArticles(articles) {
 function renderDashboard() {
   // Aggregate articles based on active filter
   let activeArticles = [];
-  
+
   if (state.activeCategory === 'all') {
     // Combine all cached articles
     Object.values(state.articlesCache).forEach(artList => {
       activeArticles = activeArticles.concat(artList);
     });
-    
+
     // De-duplicate in case feeds overlap across tabs
     const seenLinks = new Set();
     activeArticles = activeArticles.filter(art => {
@@ -663,7 +655,7 @@ function renderDashboard() {
       seenLinks.add(art.link);
       return true;
     });
-    
+
     // Sort combined by date descending
     activeArticles.sort((a, b) => b.date - a.date);
     document.getElementById('feed-title-display').textContent = 'Global Feed';
@@ -715,7 +707,7 @@ function renderCarousel(trendingArticles) {
 
   trendingArticles.forEach((art, idx) => {
     const activeClass = idx === 0 ? 'active' : '';
-    const imageSection = art.imageUrl 
+    const imageSection = art.imageUrl
       ? `<img class="carousel-image-bg" src="${art.imageUrl}" alt="${art.title}" onerror="this.outerHTML='<div class=\\'carousel-gradient-bg\\'></div>'">`
       : `<div class="carousel-gradient-bg"></div>`;
 
@@ -771,7 +763,7 @@ function setupCarouselActions(slideCount) {
   const prevBtn = document.getElementById('carousel-prev');
   const nextBtn = document.getElementById('carousel-next');
   const dots = container.querySelectorAll('.indicator-dot');
-  
+
   if (slideCount <= 1) {
     if (prevBtn) prevBtn.style.display = 'none';
     if (nextBtn) nextBtn.style.display = 'none';
@@ -783,7 +775,7 @@ function setupCarouselActions(slideCount) {
     // Handle bounds
     if (newIndex >= slideCount) newIndex = 0;
     if (newIndex < 0) newIndex = slideCount - 1;
-    
+
     state.carouselIndex = newIndex;
 
     // Update slides class
@@ -980,7 +972,7 @@ function switchCategoryTab(categoryId) {
   state.activeCategory = categoryId;
   renderCategoryTabs();
   renderDashboard();
-  
+
   // Smooth scroll page back to top to read new feed
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -992,7 +984,7 @@ function switchCategoryTab(categoryId) {
 // Creates a new category from user string input
 function addCategory(name) {
   const id = generateCategoryId(name);
-  
+
   if (!id) {
     showToast('Invalid category name', 'error');
     return;
@@ -1016,7 +1008,7 @@ function addCategory(name) {
 
   state.categories.push(newCategory);
   saveCategories();
-  
+
   // Refresh views
   renderSettingsChips();
   renderFeedsManager();
@@ -1100,7 +1092,7 @@ function restoreDefaultFeedForCategory(categoryId) {
   cat.feeds = [defaultFeed];
   saveCategories();
   renderFeedsManager();
-  
+
   showToast('Fallback Google feed restored', 'success');
   refreshCategoryFeed(categoryId);
 }
@@ -1114,7 +1106,7 @@ function showToast(message, type = 'info') {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  
+
   // Icon selector
   let iconName = 'info';
   if (type === 'success') iconName = 'check-circle';
@@ -1160,22 +1152,22 @@ function truncateText(text, length) {
 
 function formatTimeAgo(date) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  
+
   let interval = Math.floor(seconds / 31536000);
   if (interval >= 1) return `${interval}y ago`;
-  
+
   interval = Math.floor(seconds / 2592000);
   if (interval >= 1) return `${interval}mo ago`;
-  
+
   interval = Math.floor(seconds / 86400);
   if (interval >= 1) return `${interval}d ago`;
-  
+
   interval = Math.floor(seconds / 3600);
   if (interval >= 1) return `${interval}h ago`;
-  
+
   interval = Math.floor(seconds / 60);
   if (interval >= 1) return `${interval}m ago`;
-  
+
   if (seconds < 10) return 'Just now';
   return `${Math.floor(seconds)}s ago`;
 }
@@ -1185,6 +1177,6 @@ function isValidUrl(string) {
     new URL(string);
     return true;
   } catch (_) {
-    return false;  
+    return false;
   }
 }

@@ -67,13 +67,8 @@ const state = {
   isFetching: false
 };
 
-// CORS Proxy prefix (dynamic detection: uses local proxy if served locally, else fallback to public)
-const isLocalServer = window.location.protocol !== 'file:' && 
-                      (window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' || 
-                       window.location.hostname === '::1' ||
-                       window.location.hostname === '[::1]');
-const CORS_PROXY = isLocalServer ? '/proxy?url=' : 'https://corsproxy.io/?';
+// CORS Proxy prefix (uses relative proxy if served via HTTP/HTTPS, fallback to public CORS proxy if opened as local file)
+const CORS_PROXY = window.location.protocol === 'file:' ? 'https://corsproxy.io/?' : '/proxy?url=';
 
 // Stop words list for trending news analysis
 const STOP_WORDS = new Set([
